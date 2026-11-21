@@ -27,7 +27,7 @@ export function PreferencesPanel({ defaultOpen = false }: { defaultOpen?: boolea
   ];
 
   return (
-    <section className="rounded-2xl border border-line bg-surface">
+    <section className="rounded-lg border border-line bg-surface">
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
@@ -76,8 +76,8 @@ export function PreferencesPanel({ defaultOpen = false }: { defaultOpen?: boolea
                         onClick={() => toggleStore(id)}
                         aria-pressed={on}
                         title={last ? "Keep at least one store" : undefined}
-                        className={`inline-flex h-8 items-center gap-1 rounded-full border px-3 text-[13px] font-medium transition-colors ${
-                          on ? "border-ink bg-ink text-white" : "border-line text-ink-2 hover:border-line-strong"
+                        className={`inline-flex h-8 items-center gap-1 rounded-md border px-3 text-[13px] font-medium transition-colors ${
+                          on ? "border-ink bg-ink text-white" : "border-line-strong text-ink-2 hover:border-ink/40"
                         } ${last ? "cursor-not-allowed" : ""}`}
                       >
                         {on && <Check size={13} />} {STORES[id].name}

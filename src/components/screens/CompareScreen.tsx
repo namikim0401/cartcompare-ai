@@ -6,7 +6,7 @@ import { QuoteCard } from "../compare/QuoteCard";
 import { PreferencesPanel } from "../compare/PreferencesPanel";
 import { DemoDataNotice } from "../compare/DemoDataNotice";
 import { Button } from "../ui/Button";
-import { ScreenHeader } from "../ui/primitives";
+import { ScreenHeader, SectionLabel } from "../ui/primitives";
 import { BottomBar } from "../AppShell";
 import { STORES } from "@/lib/data/market";
 
@@ -20,8 +20,9 @@ export function CompareScreen() {
   return (
     <div>
       <ScreenHeader
-        title="Compare carts"
-        subtitle={`Your ${priceable.length} items, priced as a complete cart on each platform — fees, tax and promos included.`}
+        eyebrow="Compare"
+        title={best ? `${complete.length} ways to buy the same cart.` : "No complete cart yet."}
+        subtitle={`Your ${priceable.length} items, priced as one complete order on each app — delivery, service fees, tax and promos included.`}
       />
 
       <div className="space-y-3">
@@ -35,16 +36,13 @@ export function CompareScreen() {
       </p>
 
       <section className="mt-6" aria-label="Ranked options">
-        <div className="mb-2 flex items-baseline justify-between">
-          <h2 className="text-[13px] font-medium tracking-wide text-muted uppercase">Ranked by estimated total</h2>
-          <span className="text-[12.5px] text-muted">{complete.length} complete</span>
-        </div>
+        <SectionLabel aside={`${complete.length} complete`}>Ranked by total</SectionLabel>
         {complete.length === 0 ? (
           <EmptyComplete subsOff={!state.prefs.allowSubstitutions} brandStrict={!state.prefs.brandFlexible} />
         ) : (
-          <ol className="space-y-2.5">
-            {complete.map((q) => (
-              <QuoteCard key={q.channelId} quote={q} isBest={q === best} bestTotal={best?.total ?? null} />
+          <ol className="overflow-hidden rounded-lg border border-line">
+            {complete.map((q, i) => (
+              <QuoteCard key={q.channelId} quote={q} isBest={q === best} bestTotal={best?.total ?? null} rank={i + 1} />
             ))}
           </ol>
         )}
@@ -52,11 +50,11 @@ export function CompareScreen() {
 
       {incomplete.length > 0 && (
         <section className="mt-8" aria-label="Incomplete carts">
-          <h2 className="text-[13px] font-medium tracking-wide text-muted uppercase">Missing items · not ranked</h2>
-          <p className="mt-1 mb-2.5 text-[13px] leading-snug text-muted">
+          <SectionLabel>Missing items · not ranked</SectionLabel>
+          <p className="mb-2.5 text-[13px] leading-snug text-muted">
             These look cheaper only because something's left out. Turn on substitutions to fill the gaps.
           </p>
-          <ol className="space-y-2.5">
+          <ol className="overflow-hidden rounded-lg border border-line">
             {incomplete.map((q) => (
               <QuoteCard key={q.channelId} quote={q} isBest={false} bestTotal={null} />
             ))}
@@ -66,8 +64,8 @@ export function CompareScreen() {
 
       {unavailable.length > 0 && (
         <section className="mt-8">
-          <h2 className="mb-2 text-[13px] font-medium tracking-wide text-muted uppercase">Not available</h2>
-          <ul className="divide-y divide-line rounded-2xl border border-line bg-surface">
+          <SectionLabel>Not available</SectionLabel>
+          <ul className="divide-y divide-line rounded-lg border border-line bg-surface">
             {unavailable.map((q) => (
               <li key={q.channelId} className="flex items-center justify-between gap-3 px-4 py-3 text-[13.5px]">
                 <span className="text-ink-2">{q.label}</span>
@@ -96,8 +94,8 @@ export function CompareScreen() {
 
 function EmptyComplete({ subsOff, brandStrict }: { subsOff: boolean; brandStrict: boolean }) {
   return (
-    <div className="rounded-2xl border border-dashed border-line-strong p-6 text-center">
-      <p className="text-[14.5px] font-medium text-ink">No option has your whole cart.</p>
+    <div className="rounded-lg border border-dashed border-line-strong bg-paper/60 p-6 text-center">
+      <p className="display text-[22px] text-ink">No option has your whole cart.</p>
       <p className="mt-1 text-[13px] text-muted">
         {subsOff || brandStrict
           ? `Try ${[subsOff && "allowing substitutions", brandStrict && "turning on brand flexibility"].filter(Boolean).join(" or ")} in Preferences.`

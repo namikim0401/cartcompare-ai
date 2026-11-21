@@ -1,7 +1,6 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Sparkles, FlaskConical } from "lucide-react";
 import { AppProvider, STEPS, useApp, type Step } from "@/lib/state/store";
 import { ListScreen } from "./screens/ListScreen";
 import { ReviewScreen } from "./screens/ReviewScreen";
@@ -33,7 +32,7 @@ function Shell() {
     <div className="mx-auto flex min-h-dvh w-full max-w-[560px] flex-col px-4 sm:px-6">
       <TopBar />
       <Stepper />
-      <main className="flex-1 pt-6 pb-32">
+      <main className="flex-1 pt-5 pb-32">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={state.step}
@@ -57,34 +56,34 @@ function TopBar() {
   const ai = useAiEnabled();
   const { dispatch } = useApp();
   return (
-    <div className="flex items-center justify-between pt-5 pb-4">
+    <div className="flex items-center justify-between border-b border-line pt-4 pb-3">
       <button onClick={() => dispatch({ type: "goto", step: "list" })} className="flex items-center gap-2" aria-label="CartCompare home">
         <Logo />
-        <span className="text-[15px] font-semibold tracking-[-0.01em]">CartCompare</span>
+        <span className="display text-[23px] leading-none tracking-[-0.01em]">
+          Cart<em className="text-accent">compare</em>
+        </span>
       </button>
-      {ai ? (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 text-[12px] font-medium text-ink-2">
-          <Sparkles size={13} className="text-accent" /> AI on
-        </span>
-      ) : (
-        <span
-          title="No API key configured. List parsing is rule-based and explanations come from templates."
-          className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-line-strong bg-surface px-2.5 py-1 text-[12px] font-medium text-ink-2"
-        >
-          <FlaskConical size={13} /> Demo mode
-        </span>
-      )}
+      <span
+        title={
+          ai
+            ? "Items are matched with AI. Prices are simulated demo data."
+            : "No API key configured: rule-based matching, template explanations, simulated prices."
+        }
+        className="text-[11.5px] font-medium tracking-wide text-muted"
+      >
+        {ai ? "Demo prices" : "Demo mode · simulated prices"}
+      </span>
     </div>
   );
 }
 
 function Logo() {
   return (
-    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden>
-      <rect width="26" height="26" rx="8" fill="#16161a" />
-      <path d="M7 9h1.6l1.7 7.2h6.4L18.4 11H10" stroke="#fff" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="11" cy="19" r="1.2" fill="#7fd1ae" />
-      <circle cx="16.3" cy="19" r="1.2" fill="#7fd1ae" />
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden>
+      <rect width="24" height="24" rx="6" fill="#2f5d43" />
+      <path d="M6.2 8.2h1.5l1.6 6.6h5.9l1.6-4.8H8.9" stroke="#fbf9f4" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="10" cy="17.6" r="1.1" fill="#fbf9f4" />
+      <circle cx="14.9" cy="17.6" r="1.1" fill="#fbf9f4" />
     </svg>
   );
 }
@@ -99,23 +98,29 @@ function Stepper() {
   };
   const current = STEPS.findIndex((s) => s.id === state.step);
   return (
-    <nav aria-label="Progress" className="sticky top-0 z-20 -mx-4 bg-canvas/85 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6">
-      <ol className="grid grid-cols-4 gap-1.5">
+    <nav aria-label="Progress" className="sticky top-0 z-20 -mx-4 bg-canvas/90 px-4 backdrop-blur sm:-mx-6 sm:px-6">
+      <ol className="flex items-center gap-4 overflow-x-auto py-2.5 no-scrollbar">
         {STEPS.map((s, i) => {
           const active = i === current;
           const done = i < current;
           return (
-            <li key={s.id}>
+            <li key={s.id} className="shrink-0">
               <button
                 disabled={!reachable[s.id]}
                 onClick={() => dispatch({ type: "goto", step: s.id })}
                 aria-current={active ? "step" : undefined}
-                className="group w-full text-left disabled:cursor-not-allowed"
+                className="group flex items-baseline gap-1.5 disabled:cursor-not-allowed"
               >
-                <span className={`block h-[3px] rounded-full transition-colors ${active || done ? "bg-ink" : "bg-line-strong/70"}`} />
+                <span className={`tabular text-[11px] font-medium ${active ? "text-accent" : done ? "text-ink-2" : "text-muted/60"}`}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 <span
-                  className={`mt-1.5 block text-[12px] font-medium transition-colors ${
-                    active ? "text-ink" : reachable[s.id] ? "text-muted group-hover:text-ink" : "text-muted/50"
+                  className={`border-b pb-0.5 text-[13px] transition-colors ${
+                    active
+                      ? "border-ink font-medium text-ink"
+                      : reachable[s.id]
+                        ? "border-transparent text-muted group-hover:text-ink"
+                        : "border-transparent text-muted/50"
                   }`}
                 >
                   {s.label}
@@ -138,7 +143,7 @@ export function BottomBar({ children, hint }: { children: React.ReactNode; hint?
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
   return createPortal(
-    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line/80 bg-canvas/90 backdrop-blur-md">
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/92 backdrop-blur-md">
       <div className="mx-auto w-full max-w-[560px] px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] sm:px-6">
         {hint && <div className="mb-2 text-center text-[12.5px] text-muted">{hint}</div>}
         <div className="flex gap-2">{children}</div>

@@ -49,17 +49,23 @@ For the 5-item "Quick run" sample, DoorDash × Target wins on low fees. For the 
 
 ---
 
+## Visual design
+
+Editorial grocery, not SaaS dashboard: warm paper background, Instrument Serif headlines and prices over Geist UI text, one basil-green accent reserved for the primary action and savings. Lists are ruled rows on a single sheet (like a receipt or notepad) rather than stacks of rounded cards; radii are small (6–14px). Products get custom line-art glyphs on category-tinted tiles — no stock photography, no platform logos. AI is present but quiet: a small "Smart/Demo matching" indicator, amber "Check" tags on uncertain matches, and a provenance line under the recommendation.
+
 ## Information architecture
 
 ```
 CartCompare (single-page, 4-step flow; stepper allows going back to any reached step)
 │
-├── 1. List        Natural-language composer · editable/removable entries · sample lists
-│                  CTA: Organize my list  (re-organizing warns it will replace reviewed items)
+├── 1. List        Compact entry bar (one item or a pasted list) · one-tap staples
+│                  Each entry is matched on add and shown as a list row: product glyph, name,
+│                  size/brand, qty stepper, tap-to-edit, remove · pending + failed/retry rows
+│                  CTA: Compare cart prices → goes via Review only if something is flagged
 │
-├── 2. Review      Structured item cards: name, size/type, brand, qty, category, source text
+├── 2. Review      "Needs a look" sheet first, then "Matched" · size/brand selects, qty
 │                  Confidence flags with one-tap alternatives · unrecognized items w/ rephrase
-│                  Add item (parsed) · CTA: Compare N items
+│                  Add item (parsed) · CTA: Compare cart prices
 │
 ├── 3. Compare     Preferences (collapsible) · Demo-data disclosure
 │                  Ranked complete carts → Incomplete (not ranked) → Not available (e.g. no pickup)
@@ -82,7 +88,8 @@ src/
 │   ├── screens/                  ListScreen · ReviewScreen · CompareScreen · RecommendScreen
 │   ├── review/ItemCard.tsx       Item editor, ambiguity chips, unrecognized-item card
 │   ├── compare/                  QuoteCard (+FeeBreakdown, LineList) · PreferencesPanel · DemoDataNotice
-│   └── ui/                       Button · Badge · Toggle · Segmented · QtyStepper · PlatformMark
+│   └── ui/                       Button · Badge · Toggle · Segmented · QtyStepper · PlatformMark ·
+│                                 ProductGlyph (line-art product illustrations) · ScreenHeader · SectionLabel
 └── lib/
     ├── types.ts                  Domain model (money in integer cents)
     ├── data/catalog.ts           Canonical products, variants, aliases, brand base prices

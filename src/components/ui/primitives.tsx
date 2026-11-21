@@ -8,7 +8,7 @@ import type { PlatformId } from "@/lib/types";
 
 type Tone = "neutral" | "accent" | "review" | "danger" | "info";
 const tones: Record<Tone, string> = {
-  neutral: "bg-black/[0.05] text-ink-2",
+  neutral: "bg-ink/[0.05] text-ink-2",
   accent: "bg-accent-soft text-accent",
   review: "bg-review-soft text-review",
   danger: "bg-danger-soft text-danger",
@@ -17,7 +17,7 @@ const tones: Record<Tone, string> = {
 
 export function Badge({ tone = "neutral", children, className = "" }: { tone?: Tone; children: ReactNode; className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11.5px] font-medium leading-5 ${tones[tone]} ${className}`}>
+    <span className={`inline-flex items-center gap-1 rounded-sm px-1.5 py-px text-[11.5px] font-medium leading-5 ${tones[tone]} ${className}`}>
       {children}
     </span>
   );
@@ -72,7 +72,7 @@ export function Segmented<T extends string>({
   label: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="inline-flex rounded-full bg-black/[0.05] p-0.5">
+    <div role="radiogroup" aria-label={label} className="inline-flex rounded-md bg-ink/[0.06] p-0.5">
       {options.map((o) => (
         <button
           key={o.value}
@@ -80,7 +80,7 @@ export function Segmented<T extends string>({
           role="radio"
           aria-checked={value === o.value}
           onClick={() => onChange(o.value)}
-          className={`h-8 rounded-full px-3.5 text-[13px] font-medium transition-all ${
+          className={`h-8 rounded-[7px] px-3.5 text-[13px] font-medium transition-all ${
             value === o.value ? "bg-surface text-ink shadow-sm" : "text-muted hover:text-ink"
           }`}
         >
@@ -107,24 +107,24 @@ export function QtyStepper({
   const step = unit === "lb" ? 0.5 : 1;
   const min = unit === "lb" ? 0.5 : 1;
   return (
-    <div className="inline-flex h-8 items-center rounded-full border border-line bg-surface" aria-label={`Quantity for ${label}`}>
+    <div className="inline-flex h-8 items-center rounded-md border border-line bg-surface" aria-label={`Quantity for ${label}`}>
       <button
         type="button"
         aria-label="Decrease"
         disabled={value <= min}
         onClick={() => onChange(Math.max(min, +(value - step).toFixed(2)))}
-        className="grid h-8 w-8 place-items-center rounded-full text-ink-2 hover:text-ink disabled:opacity-30"
+        className="grid h-8 w-7 place-items-center text-ink-2 hover:text-ink disabled:opacity-30"
       >
         <Minus size={14} />
       </button>
-      <span className="tabular min-w-[2.75rem] text-center text-[13px] font-medium">
+      <span className="tabular min-w-[2.25rem] text-center text-[13px] font-medium">
         {unit === "lb" ? `${value} lb` : value}
       </span>
       <button
         type="button"
         aria-label="Increase"
         onClick={() => onChange(Math.min(50, +(value + step).toFixed(2)))}
-        className="grid h-8 w-8 place-items-center rounded-full text-ink-2 hover:text-ink"
+        className="grid h-8 w-7 place-items-center text-ink-2 hover:text-ink"
       >
         <Plus size={14} />
       </button>
@@ -143,7 +143,7 @@ const platformColor: Record<PlatformId, string> = {
 /** Neutral monogram, not a logo: we're not affiliated with these platforms. */
 export function PlatformMark({ platformId, name }: { platformId: PlatformId; name: string }) {
   return (
-    <span className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-line bg-surface text-[13px] font-semibold text-ink">
+    <span className="display relative grid h-10 w-10 shrink-0 place-items-center rounded-md border border-line bg-paper text-[20px] text-ink">
       {name.charAt(0)}
       <span className={`absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-surface ${platformColor[platformId]}`} />
     </span>
@@ -152,12 +152,34 @@ export function PlatformMark({ platformId, name }: { platformId: PlatformId; nam
 
 /* -------------------------------- Section -------------------------------- */
 
-export function ScreenHeader({ title, subtitle, children }: { title: string; subtitle?: ReactNode; children?: ReactNode }) {
+export function ScreenHeader({
+  eyebrow,
+  title,
+  subtitle,
+  children,
+}: {
+  eyebrow?: string;
+  title: ReactNode;
+  subtitle?: ReactNode;
+  children?: ReactNode;
+}) {
   return (
-    <header className="mb-6 animate-rise">
-      <h1 className="text-[26px] leading-tight font-semibold tracking-[-0.02em] text-ink sm:text-[30px]">{title}</h1>
-      {subtitle && <p className="mt-1.5 text-[15px] leading-relaxed text-ink-2">{subtitle}</p>}
+    <header className="mb-5 animate-rise">
+      {eyebrow && <p className="eyebrow mb-2">{eyebrow}</p>}
+      <h1 className="display text-[34px] leading-[1.05] text-ink sm:text-[40px]">{title}</h1>
+      {subtitle && <p className="mt-2 max-w-[46ch] text-[14.5px] leading-relaxed text-ink-2">{subtitle}</p>}
       {children}
     </header>
+  );
+}
+
+/** Ruled section label: "YOUR LIST ———— 5 items" */
+export function SectionLabel({ children, aside }: { children: ReactNode; aside?: ReactNode }) {
+  return (
+    <div className="mb-2 flex items-center gap-3">
+      <h2 className="eyebrow shrink-0">{children}</h2>
+      <span className="h-px flex-1 bg-line" aria-hidden />
+      {aside && <span className="shrink-0 text-[12.5px] text-muted">{aside}</span>}
+    </div>
   );
 }

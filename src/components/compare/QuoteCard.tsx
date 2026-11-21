@@ -11,7 +11,17 @@ import { Badge, PlatformMark } from "../ui/primitives";
 
 export const totalFees = (q: CartQuote) => q.deliveryFee + q.serviceFee + q.smallOrderFee + q.pickupFee;
 
-export function QuoteCard({ quote, isBest, bestTotal }: { quote: CartQuote; isBest: boolean; bestTotal: number | null }) {
+export function QuoteCard({
+  quote,
+  isBest,
+  bestTotal,
+  rank,
+}: {
+  quote: CartQuote;
+  isBest: boolean;
+  bestTotal: number | null;
+  rank?: number;
+}) {
   const [open, setOpen] = useState(false);
   const platform = PLATFORMS[quote.platformId];
   const brandSwaps = quote.lines.filter((l) => l.status === "matched" && l.brandChanged).length;
@@ -21,35 +31,45 @@ export function QuoteCard({ quote, isBest, bestTotal }: { quote: CartQuote; isBe
     <motion.li
       layout="position"
       transition={{ type: "spring", stiffness: 500, damping: 40 }}
-      className={`overflow-hidden rounded-2xl border bg-surface ${isBest ? "border-accent/40 shadow-[0_0_0_3px_rgba(29,107,79,0.07)]" : "border-line"}`}
+      className={`relative border-b border-line last:border-b-0 ${isBest ? "bg-accent-soft/40" : "bg-surface"}`}
     >
-      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} className="w-full p-4 text-left">
+      {isBest && <span className="absolute inset-y-0 left-0 w-[3px] bg-accent" aria-hidden />}
+      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} className="w-full px-4 py-3.5 text-left">
         <div className="flex items-start gap-3">
           <PlatformMark platformId={quote.platformId} name={platform.name} />
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <span className="text-[15px] font-semibold tracking-[-0.01em] text-ink">{platform.name}</span>
-              <span className="text-[13px] text-muted">at {STORES[quote.storeId].name}</span>
+            <div className="flex flex-wrap items-baseline gap-x-1.5">
+              {rank != null && <span className="tabular text-[11px] font-medium text-muted">{String(rank).padStart(2, "0")}</span>}
+              <span className="text-[15px] font-medium text-ink">{platform.name}</span>
+              <span className="text-[13px] text-muted">× {STORES[quote.storeId].name}</span>
             </div>
-            {isBest && (
-              <span className="mt-1 inline-flex items-center gap-1 text-[12px] font-medium text-accent">
-                <Trophy size={12} /> Lowest estimated total
+            {isBest ? (
+              <span className="mt-0.5 inline-flex items-center gap-1 text-[12px] font-medium text-accent">
+                <Trophy size={12} /> Cheapest complete cart
+              </span>
+            ) : (
+              <span className="mt-0.5 block text-[12px] text-muted">
+                Items {money(quote.subtotal)} · Fees {money(totalFees(quote))}
               </span>
             )}
           </div>
           <div className="text-right">
-            <div className={`tabular text-[19px] font-semibold tracking-[-0.02em] ${quote.complete ? "text-ink" : "text-muted"}`}>
+            <div className={`display tabular text-[26px] leading-none ${quote.complete ? "text-ink" : "text-muted line-through decoration-1"}`}>
               {money(quote.total)}
             </div>
-            <div className="tabular text-[12px] text-muted">
+            <div className="tabular mt-1 text-[12px] text-muted">
               {diff != null ? `+${money(diff)}` : quote.complete ? "est. total" : "partial cart"}
             </div>
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-1.5 pl-12">
-          <Badge>Items {money(quote.subtotal)}</Badge>
-          <Badge>Fees {money(totalFees(quote))}</Badge>
+        <div className="mt-2 flex flex-wrap items-center gap-1.5 pl-[52px]">
+          {isBest && (
+            <>
+              <Badge>Items {money(quote.subtotal)}</Badge>
+              <Badge>Fees {money(totalFees(quote))}</Badge>
+            </>
+          )}
           {quote.discount > 0 && <Badge tone="accent">−{money(quote.discount)} promo</Badge>}
           {quote.substitutedCount > 0 && <Badge tone="review">{quote.substitutedCount} substituted</Badge>}
           {quote.missingCount > 0 && <Badge tone="danger">{quote.missingCount} missing</Badge>}
@@ -69,7 +89,7 @@ export function QuoteCard({ quote, isBest, bestTotal }: { quote: CartQuote; isBe
           >
             <div className="border-t border-line px-4 pt-3 pb-4">
               <FeeBreakdown quote={quote} />
-              <h4 className="mt-5 mb-1.5 text-[12px] font-medium tracking-wide text-muted uppercase">Items</h4>
+              <h4 className="eyebrow mt-5 mb-1">Items</h4>
               <LineList lines={quote.lines} />
             </div>
           </motion.div>
@@ -104,9 +124,9 @@ export function FeeBreakdown({ quote }: { quote: CartQuote }) {
           <dd>−{money(quote.discount)}</dd>
         </div>
       )}
-      <div className="flex justify-between gap-4 border-t border-line pt-2 font-semibold text-ink">
+      <div className="flex items-baseline justify-between gap-4 border-t border-dashed border-line-strong pt-2.5 font-medium text-ink">
         <dt>Estimated total</dt>
-        <dd>{money(quote.total)}</dd>
+        <dd className="display text-[22px] leading-none">{money(quote.total)}</dd>
       </div>
       {!quote.complete && quote.missingCount > 0 && (
         <p className="pt-1 text-[12.5px] text-danger">Excludes {quote.missingCount} missing item{quote.missingCount > 1 ? "s" : ""}, so it isn't comparable.</p>

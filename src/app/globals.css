@@ -1,31 +1,56 @@
 @import "tailwindcss";
 
+/*
+ * CartCompare design tokens.
+ * Spacing follows Tailwind's 4px scale; we use 1/1.5/2/3/4/5/6/8/10 steps only.
+ * Radii are deliberately small (sm 6 · md 10 · lg 14) — this is a shop, not a dashboard.
+ */
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-instrument-serif), ui-serif, Georgia, serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  --color-canvas: #f7f6f3;
-  --color-surface: #ffffff;
-  --color-ink: #16161a;
-  --color-ink-2: #45454d;
-  --color-muted: #7a7a83;
-  --color-line: #e7e5e0;
-  --color-line-strong: #d6d3cc;
+  /* Paper & ink */
+  --color-canvas: #f5f1e8;
+  --color-paper: #fbf9f4;
+  --color-surface: #fffdf9;
+  --color-ink: #1c1b18;
+  --color-ink-2: #4a4740;
+  --color-muted: #858073;
+  --color-line: #e6e0d3;
+  --color-line-strong: #d3cbb9;
 
-  --color-accent: #1d6b4f;
-  --color-accent-soft: #e6f1ec;
-  --color-review: #a3620c;
-  --color-review-soft: #fdf3e2;
-  --color-danger: #b42318;
-  --color-danger-soft: #fdecea;
-  --color-info-soft: #eef1f8;
+  /* Basil green — primary action + savings */
+  --color-accent: #2f5d43;
+  --color-accent-ink: #1f4130;
+  --color-accent-soft: #e4ecdf;
 
-  --color-doordash: #d93a2b;
-  --color-ubereats: #1f8a4c;
-  --color-instacart: #e07b00;
+  /* States */
+  --color-review: #9a5b0b;
+  --color-review-soft: #f8ecd4;
+  --color-danger: #a8321f;
+  --color-danger-soft: #f6e3dc;
+  --color-info-soft: #ebe9e2;
 
-  --animate-rise: rise 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  --animate-shimmer: shimmer 1.4s linear infinite;
+  /* Product tile tints, by category */
+  --color-tint-dairy: #e9eef3;
+  --color-tint-produce: #e6eedc;
+  --color-tint-bakery: #f3e7d3;
+  --color-tint-pantry: #f1e4dc;
+  --color-tint-meat: #f4e1dd;
+  --color-tint-frozen: #e3ecef;
+  --color-tint-beverage: #ece6f0;
+  --color-tint-household: #e9e7df;
+
+  --color-doordash: #c8432f;
+  --color-ubereats: #2f7a4b;
+  --color-instacart: #cf7a12;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --animate-rise: rise 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @keyframes rise {
@@ -53,15 +78,40 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-.skeleton {
-  background: linear-gradient(90deg, #eeece7 25%, #f6f5f1 50%, #eeece7 75%);
-  background-size: 200% 100%;
-  animation: var(--animate-shimmer);
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+/* Small-caps style section label used across screens */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #ece6d9 25%, #f5f1e8 50%, #ece6d9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* In the base layer so utilities like focus:outline-none can override it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

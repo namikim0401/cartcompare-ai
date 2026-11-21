@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
-import { ArrowLeft, RotateCcw, ShieldCheck, Sparkles, Calculator } from "lucide-react";
+import { ArrowLeft, RotateCcw, ShieldCheck, Calculator } from "lucide-react";
 import { useApp } from "@/lib/state/store";
 import { buildFacts, templateExplanation } from "@/lib/recommend/explain";
 import { PLATFORMS, STORES } from "@/lib/data/market";
@@ -12,7 +12,7 @@ import { FeeBreakdown, LineList, totalFees } from "../compare/QuoteCard";
 import { PreferencesPanel } from "../compare/PreferencesPanel";
 import { DemoDataNotice } from "../compare/DemoDataNotice";
 import { Button } from "../ui/Button";
-import { PlatformMark } from "../ui/primitives";
+import { PlatformMark, SectionLabel } from "../ui/primitives";
 import { BottomBar, useAiEnabled } from "../AppShell";
 
 export function RecommendScreen() {
@@ -62,71 +62,70 @@ export function RecommendScreen() {
   return (
     <div>
       {best ? (
-        <motion.section
-          key={best.channelId}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-3xl border border-line bg-surface p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] sm:p-6"
-        >
-          <p className="text-[12px] font-medium tracking-wide text-accent uppercase">Best option for your cart</p>
-          <div className="mt-3 flex items-center gap-3">
+        <motion.section key={best.channelId} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <p className="eyebrow mb-3 text-accent!">Our pick for this cart</p>
+          <div className="flex items-center gap-3">
             <PlatformMark platformId={best.platformId} name={PLATFORMS[best.platformId].name} />
-            <div className="min-w-0 flex-1">
-              <h1 className="text-[22px] leading-tight font-semibold tracking-[-0.02em]">{best.label}</h1>
-              <p className="text-[13px] text-muted">{state.prefs.fulfillment === "delivery" ? "Delivery" : "Pickup"} · estimated total</p>
+            <div className="min-w-0">
+              <h1 className="display text-[30px] leading-none text-ink sm:text-[34px]">
+                {PLATFORMS[best.platformId].name} <em className="text-muted">at</em> {STORES[best.storeId].name}
+              </h1>
+              <p className="mt-1 text-[13px] text-muted">{state.prefs.fulfillment === "delivery" ? "Delivery" : "Pickup"} · estimated total</p>
             </div>
           </div>
-          <div className="mt-4 flex items-end justify-between gap-3">
-            <span className="tabular text-[40px] leading-none font-semibold tracking-[-0.03em]">{money(best.total)}</span>
+
+          <div className="mt-5 flex items-end justify-between gap-3 border-y border-line py-4">
+            <span className="display tabular text-[60px] leading-[0.85] text-ink">{money(best.total)}</span>
             {facts.mostExpensive && (
-              <span className="tabular rounded-full bg-accent-soft px-2.5 py-1 text-[13px] font-medium text-accent">
-                Save {facts.mostExpensive.youSave}
+              <span className="text-right">
+                <span className="display tabular block text-[24px] leading-none text-accent">{facts.mostExpensive.youSave}</span>
+                <span className="text-[12px] text-muted">less than the priciest</span>
               </span>
             )}
           </div>
 
-          <div className="mt-5 rounded-2xl bg-canvas p-4">
-            <p className={`text-[14.5px] leading-relaxed text-ink transition-opacity ${pending ? "opacity-70" : ""}`}>{text}</p>
-            <p className="mt-2.5 flex items-center gap-1.5 text-[12px] text-muted">
+          <figure className="mt-4">
+            <blockquote className={`text-[15px] leading-relaxed text-ink transition-opacity ${pending ? "opacity-60" : ""}`}>{text}</blockquote>
+            <figcaption className="mt-2 flex items-center gap-1.5 text-[12px] text-muted">
               {source === "ai" ? (
                 <>
-                  <ShieldCheck size={13} className="text-accent" /> Written by AI · every number checked against the pricing engine
+                  <ShieldCheck size={13} className="text-accent" /> Explained by AI · every number checked against our pricing engine
                 </>
               ) : pending ? (
                 <>
-                  <Sparkles size={13} className="animate-pulse" /> Asking AI to explain…
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" /> Writing a plain-language summary…
                 </>
               ) : (
                 <>
-                  <Calculator size={13} /> Generated directly from the pricing engine
+                  <Calculator size={13} /> Summary generated from our pricing engine
                 </>
               )}
-            </p>
+            </figcaption>
             {current?.note && <p className="mt-1 text-[12px] text-review">{current.note}</p>}
-          </div>
+          </figure>
         </motion.section>
       ) : (
-        <div className="rounded-3xl border border-dashed border-line-strong p-6">
-          <h1 className="text-[20px] font-semibold">No recommendation yet</h1>
+        <div className="rounded-lg border border-dashed border-line-strong bg-paper/60 p-6">
+          <h1 className="display text-[28px] leading-tight">No pick yet.</h1>
           <p className="mt-1.5 text-[14px] text-ink-2">{template}</p>
         </div>
       )}
 
-      <div className="mt-4">
+      <div className="mt-6">
         <PreferencesPanel />
       </div>
 
       {complete.length > 1 && (
         <section className="mt-8">
-          <h2 className="text-[13px] font-medium tracking-wide text-muted uppercase">Where the money goes</h2>
+          <SectionLabel>Where the money goes</SectionLabel>
           <CostBars quotes={complete} />
         </section>
       )}
 
       {best && (
         <section className="mt-8">
-          <h2 className="mb-2 text-[13px] font-medium tracking-wide text-muted uppercase">Your cart at {best.label}</h2>
-          <div className="rounded-2xl border border-line bg-surface px-4 pt-1 pb-4">
+          <SectionLabel aside={`${best.lines.length} items`}>Your receipt</SectionLabel>
+          <div className="rounded-lg border border-line bg-surface px-4 pt-1 pb-4">
             <LineList lines={best.lines} />
             <div className="mt-3 border-t border-line pt-3">
               <FeeBreakdown quote={best} />
@@ -162,7 +161,7 @@ function CostBars({ quotes }: { quotes: CartQuote[] }) {
   const max = Math.max(...quotes.map((q) => q.subtotal + totalFees(q) + q.tax));
   const pct = (c: number) => `${(c / max) * 100}%`;
   return (
-    <div className="mt-3 rounded-2xl border border-line bg-surface p-4">
+    <div className="rounded-lg border border-line bg-surface p-4">
       <ul className="space-y-3.5">
         {quotes.map((q, i) => (
           <li key={q.channelId}>
@@ -172,7 +171,7 @@ function CostBars({ quotes }: { quotes: CartQuote[] }) {
               </span>
               <span className={`tabular ${i === 0 ? "font-semibold text-ink" : "text-ink-2"}`}>{money(q.total)}</span>
             </div>
-            <div className="flex h-2.5 overflow-hidden rounded-full bg-black/[0.04]" aria-hidden>
+            <div className="flex h-2 overflow-hidden rounded-sm bg-ink/[0.05]" aria-hidden>
               <motion.span layout className={`h-full ${i === 0 ? "bg-accent" : "bg-ink/80"}`} style={{ width: pct(q.subtotal) }} />
               <motion.span layout className="h-full bg-ink/30" style={{ width: pct(totalFees(q)) }} />
               <motion.span layout className="h-full bg-ink/15" style={{ width: pct(q.tax) }} />
@@ -193,7 +192,7 @@ function CostBars({ quotes }: { quotes: CartQuote[] }) {
 function Legend({ className, label }: { className: string; label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span className={`h-2 w-2 rounded-full ${className}`} /> {label}
+      <span className={`h-2 w-2 rounded-sm ${className}`} /> {label}
     </span>
   );
 }
